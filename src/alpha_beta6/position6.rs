@@ -1,16 +1,16 @@
-struct Position6 {
+pub const NBCOINS: usize = 42;
+pub const WIDTH: usize = 7;
+pub const HEIGHT: usize = 6;
+
+pub struct Position6 {
     pub heights: [u8; 7],
-    pub moves: u8,
+    pub moves: usize,
     bitboard: [u64; 2]
 }
 
 impl Position6 {
-    const WIDTH: usize = 7;
-    const HEIGHT: u8 = 6;
-    const NBCOINS: u8 = 42;
-
-    fn new() -> Position6 {
-        Position6 {
+    pub fn new() -> Self {
+        Self {
             heights: [0, 7, 14, 21, 28, 35, 42],
             moves: 0,
             bitboard: [0, 0]
@@ -21,7 +21,7 @@ impl Position6 {
         self.heights[col] % 7 != 6
     }
 
-    fn is_winning_move(&self, col: usize) -> bool {
+    pub fn is_winning_move(&self, col: usize) -> bool {
         let mut pos = self.bitboard[(self.moves & 1) as usize];
         pos ^= 1 << self.heights[col];
 
@@ -44,24 +44,24 @@ impl Position6 {
         false
     }
 
-    fn play(&mut self, col: usize) {
+    pub fn play(&mut self, col: usize) {
         let mov = 1 << self.heights[col];
-        self.heights[col] = self.heights[col] + 1;
+        self.heights[col] += 1;
         self.bitboard[(self.moves & 1) as usize] ^= mov;
-        self.moves = self.moves + 1;
+        self.moves += 1;
     }
 
-    fn unplay(&mut self, col: usize) {
-        self.moves = self.moves - 1;
-        self.heights[col] = self.heights[col] - 1;
+    pub fn unplay(&mut self, col: usize) {
+        self.moves -= 1;
+        self.heights[col] -= 1;
         let mov = 1 << self.heights[col];
         self.bitboard[(self.moves & 1) as usize] ^= mov;
     }
 
-    fn play_sequence (&mut self, seq: &str) -> usize {
+    pub fn play_sequence (&mut self, seq: &str) -> usize {
         for (index_seq, seq_item) in seq.chars().enumerate() { 
             let col = (seq_item.to_digit(10).unwrap() - 1) as usize;
-            if col >= Position6::WIDTH || !self.can_play(col) || self.is_winning_move(col) {
+            if col >= WIDTH || !self.can_play(col) || self.is_winning_move(col) {
                 return index_seq;
             }
             self.play(col)
